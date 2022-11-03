@@ -64,8 +64,19 @@ app.get(`/${baseURL}/products/:product_id/styles`, (req, res) => {
 })
 
 app.get(`/${baseURL}/products/:product_id/related`, (req, res) => {
-  console.log(`Reached related of product id`, req.params.product_id);
-  res.sendStatus(200);
+  const product_id = req.params.product_id;
+  const queryRelated = `SELECT related_id FROM related WHERE product_id=${product_id}`
+  client.query(queryRelated)
+    .then(related => {
+      // console.log('Related', related.rows)
+      const relatedId = []
+      for (let i = 0; i < related.rows.length; i++) {
+        relatedId.push(related.rows[i].related_id)
+      }
+      // console.log('Related arrays', relatedId)
+      res.status(200).json(relatedId);
+    })
+    .catch(err => res.sendStatus(500))
 })
 
 app.listen(port, function() {
