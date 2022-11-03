@@ -40,8 +40,27 @@ app.get(`/${baseURL}/products/:product_id`, (req, res) => {
 })
 
 app.get(`/${baseURL}/products/:product_id/styles`, (req, res) => {
-  console.log(`Reached styles of product id`, req.params.product_id);
-  res.sendStatus(200);
+  let product_id = req.params.product_id;
+  const result = {product_id: req.params.product_id}
+  const queryStyles = `SELECT * FROM styles WHERE product_id=${product_id}`
+  client.query(queryStyles)
+    .then(async (styles) => {
+      // console.log('Styles ', styles.rows); // Returns an array of style objects where I'll need to add a photos property
+      const allStyles = styles.rows;
+      for (let i = 0; i < allStyles.length; i++) {
+        const queryPhotos = `SELECT thumbnail_url, url FROM photos WHERE style_id=${allStyles[i].style_id}`
+        const photos = await client.query(queryPhotos)
+        // console.log('Photos ', photos.rows);
+        const skus =
+        allStyles[i].photos = photos.rows;
+      }
+      // console.log('Styles array', allStyles);
+      result.results = allStyles;
+      res.status(200).json(result)
+    })
+    .catch(err => {
+      res.status(500).json(err)
+    })
 })
 
 app.get(`/${baseURL}/products/:product_id/related`, (req, res) => {
