@@ -1,0 +1,30 @@
+{
+  "name": "products-api-service-tuan",
+  "version": "1.0.0",
+  "description": "Develop product API service to support FEC project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./server/index.js",
+    "server-dev": "npx nodemon --watch server server/index.js"
+  },
+  "dependencies": {
+    "axios": "^0.21.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.20",
+    "pg": "^8.8.0",
+    "sequelize": "^6.25.3",
+    "mongoose": "^6.7.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SDC-Peach/Products-API-Service-Tuan.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SDC-Peach/Products-API-Service-Tuan/issues"
+  },
+  "homepage": "https://github.com/SDC-Peach/Products-API-Service-Tuan#readme"
+}
