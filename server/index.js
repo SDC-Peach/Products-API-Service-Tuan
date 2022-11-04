@@ -48,11 +48,14 @@ app.get(`/${baseURL}/products/:product_id/styles`, (req, res) => {
       // console.log('Styles ', styles.rows); // Returns an array of style objects where I'll need to add a photos property
       const allStyles = styles.rows;
       for (let i = 0; i < allStyles.length; i++) {
-        const queryPhotos = `SELECT thumbnail_url, url FROM photos WHERE style_id=${allStyles[i].style_id}`
+        let styleId = allStyles[i].style_id;
+        const queryPhotos = `SELECT thumbnail_url, url FROM photos WHERE style_id=${styleId}`
+        const querySkus = `SELECT size, quantity FROM skus WHERE style_id=${styleId}`
         const photos = await client.query(queryPhotos)
         // console.log('Photos ', photos.rows);
-        const skus =
+        const skus =  await client.query(querySkus)
         allStyles[i].photos = photos.rows;
+        allStyles[i].skus = skus.rows;
       }
       // console.log('Styles array', allStyles);
       result.results = allStyles;
