@@ -12,21 +12,30 @@ app.get('/', (req, res) => {
 
 const baseURL = 'SDC-Peach';
 
-app.get(`/${baseURL}/products/`, (req, res) => {
-  console.log(`Reached products`);
-  res.sendStatus(200);
+// API route to retrieve several products
+app.get(`/${baseURL}/products`, (req, res) => {
+  const page = req.query.page || 1;
+  const count = req.query.count || 5;
+  const queryProducts = `SELECT * FROM product ORDER BY id ASC LIMIT ${count} OFFSET 0`
+  client.query(queryProducts)
+    .then(products => {
+      res.status(200).json(products.rows)
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    })
 })
 
+// API route to retrieve a specific product
 app.get(`/${baseURL}/products/:product_id`, (req, res) => {
-  let product_id = req.params.product_id;
+  console.log('Request params', req.query)
+  const product_id = req.query.product_id;
   const queryProduct = `SELECT * FROM product WHERE id=${product_id}`
   client.query(queryProduct)
     .then(product => {
-      // console.log('Product ', product.rows);
       const queryFeatures = `SELECT feature, value FROM features WHERE product_id=${product_id}`
       client.query(queryFeatures)
         .then(features => {
-          // console.log('Features ', features.rows)
           product.rows[0].features = features.rows
           res.status(200).json(product.rows[0])
         })
@@ -39,25 +48,32 @@ app.get(`/${baseURL}/products/:product_id`, (req, res) => {
     })
 })
 
+// API route to retrieve product's style
 app.get(`/${baseURL}/products/:product_id/styles`, (req, res) => {
-  let product_id = req.params.product_id;
-  const result = {product_id: req.params.product_id}
+  const product_id = req.query.product_id;
+  const result = {product_id: product_id}
   const queryStyles = `SELECT * FROM styles WHERE product_id=${product_id}`
   client.query(queryStyles)
     .then(async (styles) => {
-      // console.log('Styles ', styles.rows); // Returns an array of style objects where I'll need to add a photos property
       const allStyles = styles.rows;
       for (let i = 0; i < allStyles.length; i++) {
         let styleId = allStyles[i].style_id;
         const queryPhotos = `SELECT thumbnail_url, url FROM photos WHERE style_id=${styleId}`
-        const querySkus = `SELECT size, quantity FROM skus WHERE style_id=${styleId}`
+        const querySkus = `SELECT * FROM skus WHERE style_id=${styleId}`
         const photos = await client.query(queryPhotos)
-        // console.log('Photos ', photos.rows);
         const skus =  await client.query(querySkus)
+        const formatSku = {}
+        for (let j = 0; j < skus.rows.length; j++) {
+          let currentSku = skus.rows[j]
+          formatSku[currentSku.id] = {
+            quantity: currentSku.quantity,
+            size: currentSku.size
+          }
+        }
+        // console.log('Format sku:', formatSku)
         allStyles[i].photos = photos.rows;
-        allStyles[i].skus = skus.rows;
+        allStyles[i].skus = formatSku;
       }
-      // console.log('Styles array', allStyles);
       result.results = allStyles;
       res.status(200).json(result)
     })
@@ -66,17 +82,16 @@ app.get(`/${baseURL}/products/:product_id/styles`, (req, res) => {
     })
 })
 
+// API route to retrieve related products
 app.get(`/${baseURL}/products/:product_id/related`, (req, res) => {
-  const product_id = req.params.product_id;
+  const product_id = req.query.product_id;
   const queryRelated = `SELECT related_id FROM related WHERE product_id=${product_id}`
   client.query(queryRelated)
     .then(related => {
-      // console.log('Related', related.rows)
       const relatedId = []
       for (let i = 0; i < related.rows.length; i++) {
         relatedId.push(related.rows[i].related_id)
       }
-      // console.log('Related arrays', relatedId)
       res.status(200).json(relatedId);
     })
     .catch(err => res.sendStatus(500))
