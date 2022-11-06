@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const client = require('../db/index.js');
 module.exports = { getProducts, getProduct, getStyles, getRelated } = require('./controllers.js')
 
 app.use(express.json());
