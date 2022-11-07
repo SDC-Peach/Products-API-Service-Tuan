@@ -28,22 +28,25 @@ const getProducts = (req, res) => {
 
 const getProduct = (req, res) => {
   const product_id = req.query.product_id;
-  const queryProduct = `SELECT * FROM product WHERE id=${product_id}`
-  pool.query(queryProduct)
-    .then(product => {
-      const queryFeatures = `SELECT feature, value FROM features WHERE product_id=${product_id}`
-      pool.query(queryFeatures)
-        .then(features => {
-          product.rows[0].features = features.rows;
-          res.status(200).json(product.rows[0])
-        })
-        .catch(err => {
-          res.status(500).json(err)
-        })
+  const queryProduct = `SELECT id, name, slogan, description, category, default_price FROM product WHERE id=${product_id}`
+  const queryFeatures = `SELECT feature, value FROM features WHERE product_id=${product_id}`
+
+  const searchProduct = pool.query(queryProduct)
+    .then(product => product)
+    .catch(err => err)
+  const searchFeatures = pool.query(queryFeatures)
+    .then(features => features)
+    .catch(err => err)
+
+  Promise.all([searchProduct, searchFeatures])
+    .then(([product, features]) => {
+      product.rows[0].features = features.rows;
+      res.status(200).json(product.rows[0])
     })
     .catch(err => {
       res.status(500).json(err)
     })
+
 }
 
 const getStyles = (req, res) => {
