@@ -97,9 +97,11 @@ const test_styles_10 = {
 }
 
 const test_related_1 = [2, 3, 8, 7]
+const test_related_2 = [3, 7, 6, 5]
 
 module.exports = {
   test_product_10,
   test_styles_10,
-  test_related_1
+  test_related_1,
+  test_related_2
 }
