@@ -46,7 +46,6 @@ const getProduct = (req, res) => {
     .catch(err => {
       res.status(500).json(err)
     })
-
 }
 
 const getStyles = (req, res) => {
@@ -103,6 +102,7 @@ const getCart = (req, res) => {
 const addToCart = (req, res) => {
 
 }
+
 
 module.exports = {
   getProducts,

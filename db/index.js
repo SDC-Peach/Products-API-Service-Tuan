@@ -21,7 +21,6 @@ const copyDataQuery = (data) => {
     CSV HEADER;
     ON CONFLICT ${data} DO NOTHING`
 }
-
 // Product Table
 const productSchemaAndLoad = `
   CREATE TABLE IF NOT EXISTS product
@@ -49,7 +48,7 @@ const relatedSchema = `
 pool.query(relatedSchema)
   .then(() => console.log('Loaded related data'))
   .catch(err => console.log('Could not load related data. Error:', err))
-
+  
 // Features Table
 const featureSchema = `
   CREATE TABLE IF NOT EXISTS features
@@ -93,7 +92,7 @@ const photoSchema = `
 pool.query(photoSchema)
   .then(() => console.log('Loaded photos data'))
   .catch(err => console.log('Could not load photos data. Error:', err))
-
+  
 // Skus Table
 const skuSchema = `
   CREATE TABLE IF NOT EXISTS skus
@@ -119,4 +118,5 @@ CREATE TABLE IF NOT EXISTS cart
 pool.query(cartSchema)
   .then(() => console.log('Loaded cart data'))
   .catch(err => console.log('Could not load cart data. Error:', err))
-pool.end()
+
+
