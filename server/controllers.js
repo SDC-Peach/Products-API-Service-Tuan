@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { Pool } = require('pg');
+
 const config = {
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -9,8 +10,9 @@ const config = {
 }
 const pool = new Pool(config);
 pool.connect()
-  .then(() => console.log('DB connected'))
+  .then(() => console.log('DB connected!'))
   .catch((err) => console.log('Failed DB connection: Error', err))
+
 const getProducts = (req, res) => {
   const page = req.query.page || 1;
   const count = req.query.count || 5;
@@ -23,25 +25,29 @@ const getProducts = (req, res) => {
       res.status(500).json(err)
     })
 }
+
 const getProduct = (req, res) => {
   const product_id = req.query.product_id;
-  const queryProduct = `SELECT * FROM product WHERE id=${product_id}`
-  pool.query(queryProduct)
-    .then(product => {
-      const queryFeatures = `SELECT feature, value FROM features WHERE product_id=${product_id}`
-      pool.query(queryFeatures)
-        .then(features => {
-          product.rows[0].features = features.rows;
-          res.status(200).json(product.rows[0])
-        })
-        .catch(err => {
-          res.status(500).json(err)
-        })
+  const queryProduct = `SELECT id, name, slogan, description, category, default_price FROM product WHERE id=${product_id}`
+  const queryFeatures = `SELECT feature, value FROM features WHERE product_id=${product_id}`
+
+  const searchProduct = pool.query(queryProduct)
+    .then(product => product)
+    .catch(err => err)
+  const searchFeatures = pool.query(queryFeatures)
+    .then(features => features)
+    .catch(err => err)
+
+  Promise.all([searchProduct, searchFeatures])
+    .then(([product, features]) => {
+      product.rows[0].features = features.rows;
+      res.status(200).json(product.rows[0])
     })
     .catch(err => {
       res.status(500).json(err)
     })
 }
+
 const getStyles = (req, res) => {
   const product_id = req.query.product_id;
   const result = {product_id: product_id}
@@ -74,6 +80,7 @@ const getStyles = (req, res) => {
       res.status(500).json(err)
     })
 }
+
 const getRelated = (req, res) => {
   const product_id = req.query.product_id;
   const queryRelated = `SELECT related_id FROM related WHERE product_id=${product_id}`
@@ -87,10 +94,16 @@ const getRelated = (req, res) => {
     })
     .catch(err => res.sendStatus(500))
 }
+
 const getCart = (req, res) => {
+
 }
+
 const addToCart = (req, res) => {
+
 }
+
+
 module.exports = {
   getProducts,
   getProduct,

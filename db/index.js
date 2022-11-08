@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { Pool } = require('pg');
+
 const config = {
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -11,6 +12,7 @@ const pool = new Pool(config);
 pool.connect()
   .then(() => console.log('DB connected!'))
   .catch(() => console.log('Failed DB connection'))
+
 // Helper function to create the copy query
 const copyDataQuery = (data) => {
   return `COPY ${data}
@@ -33,6 +35,7 @@ const productSchemaAndLoad = `
 pool.query(productSchemaAndLoad)
   .then(() => console.log('Loaded product data'))
   .catch(err => console.log('Could not load product data. Error:', err))
+
 // Related Table
 const relatedSchema = `
   CREATE TABLE IF NOT EXISTS related
@@ -45,6 +48,7 @@ const relatedSchema = `
 pool.query(relatedSchema)
   .then(() => console.log('Loaded related data'))
   .catch(err => console.log('Could not load related data. Error:', err))
+  
 // Features Table
 const featureSchema = `
   CREATE TABLE IF NOT EXISTS features
@@ -58,6 +62,7 @@ const featureSchema = `
 pool.query(featureSchema)
   .then(() => console.log('Loaded features data'))
   .catch(err => console.log('Could not load features data. Error:', err))
+
 // Styles Table
 const styleSchema = `
   CREATE TABLE IF NOT EXISTS styles
@@ -73,6 +78,7 @@ const styleSchema = `
 pool.query(styleSchema)
   .then(() => console.log('Loaded styles data'))
   .catch(err => console.log('Could not load styles data. Error:', err))
+
 // Photos Table
 const photoSchema = `
   CREATE TABLE IF NOT EXISTS photos
@@ -86,6 +92,7 @@ const photoSchema = `
 pool.query(photoSchema)
   .then(() => console.log('Loaded photos data'))
   .catch(err => console.log('Could not load photos data. Error:', err))
+  
 // Skus Table
 const skuSchema = `
   CREATE TABLE IF NOT EXISTS skus
@@ -99,6 +106,7 @@ const skuSchema = `
 pool.query(skuSchema)
   .then(() => console.log('Loaded skus data'))
   .catch(err => console.log('Could not load skus data. Error:', err))
+
 const cartSchema = `
 CREATE TABLE IF NOT EXISTS cart
 (id INT,
@@ -110,4 +118,5 @@ CREATE TABLE IF NOT EXISTS cart
 pool.query(cartSchema)
   .then(() => console.log('Loaded cart data'))
   .catch(err => console.log('Could not load cart data. Error:', err))
-pool.end()
+
+

@@ -4,6 +4,7 @@
   "description": "Develop product API service to support FEC project",
   "main": "index.js",
   "scripts": {
+    "seed": "node ./db/index.js",
     "test": "npx jest",
     "start": "node ./server/index.js",
     "server-dev": "npx nodemon --watch server server/index.js"
