@@ -4,10 +4,10 @@
   "description": "Develop product API service to support FEC project",
   "main": "index.js",
   "scripts": {
-    "seed": "node ./db/index.js",
-    "test": "npx jest",
-    "start": "node ./server/index.js",
-    "server-dev": "npx nodemon --watch server server/index.js"
+    "create-db": "psql postgres -a -f ./db/schema.sql",
+    "seed": "node ./db/seed.js",
+    "server-dev": "npx nodemon --watch server server/index.js",
+    "test": "npx jest"
   },
   "dependencies": {
     "axios": "^1.1.3",

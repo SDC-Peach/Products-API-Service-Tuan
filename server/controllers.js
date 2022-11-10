@@ -16,7 +16,8 @@ pool.connect()
 const getProducts = (req, res) => {
   const page = req.query.page || 1;
   const count = req.query.count || 5;
-  const queryProducts = `SELECT * FROM product ORDER BY id ASC LIMIT ${count} OFFSET 0`;
+  let productPage = 1000 * (page - 1)
+  const queryProducts = `SELECT * FROM product WHERE id >= 0 ORDER BY id ASC LIMIT ${count}`;
   pool.query(queryProducts)
     .then(products => {
       res.status(200).json(products.rows)
@@ -53,14 +54,21 @@ const getStyles = (req, res) => {
   const result = {product_id: product_id}
   const queryStyles = `SELECT style_id, name, original_price, sale_price, default_style FROM styles WHERE product_id=${product_id}`
   pool.query(queryStyles)
-    .then(async (styles) => {
+    .then(async styles => {
       const allStyles = styles.rows;
       for (let i = 0; i < allStyles.length; i++) {
         let styleId = allStyles[i].style_id;
+        // Reassign default style value to 'default?' key based on API documentation
+        allStyles[i]['default?'] = allStyles[i].default_style;
+        delete allStyles[i].default_style;
+
         const queryPhotos = `SELECT thumbnail_url, url FROM photos WHERE style_id=${styleId}`
         const querySkus = `SELECT * FROM skus WHERE style_id=${styleId}`
-        const photos = await pool.query(queryPhotos)
-        const skus =  await pool.query(querySkus)
+        const searchPhotos = pool.query(queryPhotos)
+        const searchSkus = pool.query(querySkus)
+        const photos = await searchPhotos;
+        const skus = await searchSkus;
+        // Format sku data based on API documentation
         const formatSku = {}
         for (let j = 0; j < skus.rows.length; j++) {
           let currentSku = skus.rows[j]
@@ -69,16 +77,14 @@ const getStyles = (req, res) => {
             size: currentSku.size
           }
         }
-        // console.log('Format sku:', formatSku)
+        // Append photos and sku to each style object
         allStyles[i].photos = photos.rows;
-        allStyles[i].skus = formatSku;
+        allStyles[i].skus = formatSku
       }
       result.results = allStyles;
       res.status(200).json(result)
     })
-    .catch(err => {
-      res.status(500).json(err)
-    })
+    .catch(err => res.status(500).json(err))
 }
 
 const getRelated = (req, res) => {
