@@ -16,7 +16,8 @@ pool.connect()
 const getProducts = (req, res) => {
   const page = req.query.page || 1;
   const count = req.query.count || 5;
-  const queryProducts = `SELECT * FROM product ORDER BY id ASC LIMIT ${count} OFFSET 0`;
+  let productPage = 1000 * (page - 1)
+  const queryProducts = `SELECT * FROM product WHERE id >= 0 ORDER BY id ASC LIMIT ${count}`;
   pool.query(queryProducts)
     .then(products => {
       res.status(200).json(products.rows)
